@@ -2,16 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/index.css';
 import App from './components/App';
-import reportWebVitals from './reportWebVitals';
+import { ApolloProvider, ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
+// 將 Apollo client 實例和 GraphQL API 做連接
+const httpLink = createHttpLink({
+  // GraphQL server 會運行在此 uri 上
+  uri: 'http://localhost:4000'
+})
+
+// 實例化 Apollo client
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache()
+})
+
+ReactDOM.render(
+  // 在 App 最外層用 ApolloProvider 包裹住
+  <ApolloProvider client={client}>
     <App />
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  </ApolloProvider>,
+  document.getElementById('root')
+)
