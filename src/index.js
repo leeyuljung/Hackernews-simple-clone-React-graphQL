@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/index.css';
 import App from './components/App';
+import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 
 // 將 Apollo client 實例和 GraphQL API 做連接
@@ -18,8 +19,10 @@ const client = new ApolloClient({
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
-  // 在 App 最外層用 ApolloProvider 包裹住
-  <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>
+  <BrowserRouter>
+    {/* 在 App 外層用 ApolloProvider 包裹住 */}
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  </BrowserRouter>
 )
