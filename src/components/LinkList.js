@@ -26,8 +26,48 @@ export const FEED_QUERY = gql`
     }
 `
 
+// 監聽任何新的 links
+const NEW_LINKS_SUBSCRIPTION = gql`
+    subscription {
+        newLink {
+            id
+            url
+            description
+            createdAt
+            postedBy {
+                id
+                name
+            }
+            votes {
+                id
+                user {
+                    id
+                }
+            }
+        }
+    }
+`
+
 const LinkList = () => {
-    const { data } = useQuery(FEED_QUERY)
+    const { data, loading, error, subscribeToMore } = useQuery(FEED_QUERY)
+
+    subscribeToMore({
+        document: NEW_LINKS_SUBSCRIPTION,
+        updateQuery: (prev, { subscriptionData }) => {
+            if(!subscriptionData) return prev
+            const newLink = subscriptionData.data.newLink
+            const exists = prev.feed.links.find(({id}) => id === newLink.id)
+            if(exists) return prev
+
+            return Object.assign({}, prev, {
+                feed: {
+                    link: [ newLink, ...prev.feed.links ],
+                    count: prev.feed.links.length + 1,
+                    __typename: prev.feed.__typename
+                }
+            })
+        }
+    })
 
     return (
         <div>
